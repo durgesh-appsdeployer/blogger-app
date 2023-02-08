@@ -1,39 +1,39 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState} from 'react';
 import {TouchableOpacity, View, Text, Image, TextInput} from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import {store} from '../redux/Store';
 
-export default function NewBlog({route, navigation}) {
+export default function NewBlog(props) {
   const [blog, setBlog] = useState('');
 
   return (
     <View
       style={{
         flex: 1,
-        backgroundColor: '#1e2945',
+        backgroundColor: 'white',
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'center',
       }}>
+      <Text style={{color: "black", fontWeight: "700", fontSize: 17, marginBottom: 5, alignSelf: "flex-start", marginLeft: 20}}>Add Your blog Here: </Text>
       <TextInput
         multiline={true}
         textAlignVertical="top"
         cursorColor="dodgerblue"
         secureTextEntry={false}
         style={{
-          color: 'white',
+          color: 'black',
           borderRadius: 5,
           borderWidth: 1,
-          borderColor: 'gray',
+          borderColor: 'lightgray',
           padding: 10,
           height: '50%',
-          width: '80%',
+          width: '90%',
           fontSize: 15,
-          marginBottom: '20%',
+          marginBottom: '10%',
         }}
         value={blog}
-        onChangeText={_content => {setBlog(_content); console.log(blog)}}
+        onChangeText={_content => {setBlog(_content)}}
       />
       <TouchableOpacity
         title="New Blog"
@@ -51,18 +51,18 @@ export default function NewBlog({route, navigation}) {
             store.dispatch({
               type: 'blogAdded',
               data: {
-                blog
+                blog,
+                image: `${x}.jpg`
               },
             });
             setBlog('');
-            navigation.navigate('Home');
-            route.params.update();
+            props.navigation.push('Home');
           } else {
             alert('Write something!!');
           }
         }}>
         <Image
-          source={require('./assets/PlusWhite.png')}
+          source={require('./assets/check-white.png')}
           style={{height: 18, width: 18, marginRight: 10}}
         />
         <Text style={{color: 'white', fontSize: 15}}>Save</Text>

@@ -3,9 +3,10 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 export async function reducer(state = [], action) {
   let count = await AsyncStorage.getItem('count');
   count = parseInt(count);
-  console.log(count);
   let blogs = JSON.parse(await AsyncStorage.getItem('blogs'));
-  console.log(blogs);
+  const blog = blogs.filter(blog => {
+    return blog.id === action.data.id;
+  });
   switch (action.type) {
     case 'blogAdded':
       count++;
@@ -16,36 +17,33 @@ export async function reducer(state = [], action) {
         likes: 0,
         dislikes: 0,
         comments: [],
+        image: action.data.image
       };
       const allBlogs = [...blogs, newBlog];
       await AsyncStorage.setItem('blogs', JSON.stringify(allBlogs));
       return allBlogs;
 
     case 'commentAdded':
-      let comments = blogs.filter(blog => {
-        return blog.id === action.data.id;
-      }).comments;
+      let comments = blog[0].comments;
       const newComment = action.data.comment;
       await AsyncStorage.setItem(
         'blogs',
         JSON.stringify(
           blogs.map(blog =>
             blog.id === action.data.id
-              ? {...blog, comments: {...comments, newComment}}
+              ? {...blog, comments: [...comments, newComment]}
               : blog,
           ),
         ),
       );
       return blogs.map(todo =>
         todo.id === action.data.id
-          ? {...todo, comments: {...comments, newComment}}
+          ? {...todo, comments: [...comments, newComment]}
           : todo,
       );
 
     case 'liked':
-      let like_count = blogs.filter(blog => {
-        return blog.id === action.data.id;
-      }).likes;
+      let like_count = blog[0].likes
       await AsyncStorage.setItem(
         'blogs',
         JSON.stringify(
@@ -61,9 +59,7 @@ export async function reducer(state = [], action) {
       );
 
     case 'disliked':
-      let dislike_count = blogs.filter(blog => {
-        return blog.id === action.data.id;
-      }).dislikes;
+      let dislike_count = blog[0].dislikes
       await AsyncStorage.setItem(
         'blogs',
         JSON.stringify(

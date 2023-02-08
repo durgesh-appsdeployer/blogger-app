@@ -1,35 +1,31 @@
 import React, {useState, useEffect} from 'react';
 import {TouchableOpacity, View, Text, Image, FlatList} from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import store from '../redux/Store';
 import SingleBlog from "./SingleBlog";
 
 export default function Home({navigation}) {
   const [blogs, setBlogs] = useState([]);
-  const fetchBlogs = async () => {
+
+  const getBlogs = async () => {
+    //await AsyncStorage.clear();
     const blog = await AsyncStorage.getItem('blogs');
     if(blog===null){
       await AsyncStorage.setItem('count', "0");
       await AsyncStorage.setItem('blogs', "[]");
     }
-    const Blogs = JSON.parse(await AsyncStorage.getItem('blogs')).reverse();
-    setBlogs(Blogs);
-    console.log(blogs);
+    const Blogs = await AsyncStorage.getItem('blogs');
+    await setBlogs(JSON.parse(Blogs).reverse());
   };
 
-  const addBlog = () => {
-
-  }
-
   useEffect(() => {
-    fetchBlogs();
+    getBlogs();
   }, []);
 
   return (
     <View
       style={{
         flex: 1,
-        backgroundColor: '#1e2936',
+        backgroundColor: 'white',
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
@@ -46,19 +42,17 @@ export default function Home({navigation}) {
           alignItems: 'center',
           borderRadius: 50,
         }}
-        onPress={() => {navigation.navigate("NewBlog", {update: fetchBlogs})}}>
+        onPress={() => {navigation.push("NewBlog", {getBlogs: getBlogs})}}>
         <Image
-          source={require('./assets/PlusWhite.png')}
+          source={require('./assets/plus.png')}
           style={{height: 18, width: 18, marginRight: 10}}
         />
         <Text style={{color: 'white', fontSize: 15}}>New Blog</Text>
       </TouchableOpacity>
       <View
         style={{
-          borderWidth: 1,
-          borderColor: 'gray',
-          height: 600,
-          width: 320,
+          height: "70%",
+          width: "100%",
           marginTop: 40,
           borderRadius: 5,
           display: "flex",
@@ -69,15 +63,15 @@ export default function Home({navigation}) {
         <FlatList
           nestedScrollEnabled={true}
           data={blogs}
-          style={{width: "98%", padding: 20}}
+          style={{width: "100%", display: "flex", flexDirection: "column"}}
           renderItem={({item}) => (
             <SingleBlog
               navigation={navigation}
               data={item}
-              update={fetchBlogs}
+              getBlogs={getBlogs}
             />
           )}
-          keyExtractor={item => item.textID}
+          keyExtractor={item => item.id}
         />
       </View>
     </View>
